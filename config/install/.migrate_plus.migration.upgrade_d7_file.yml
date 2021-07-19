@@ -1,0 +1,89 @@
+uuid: 9c9c2196-2eb7-4d7f-8ae1-7e71d385a0c7
+langcode: en
+status: true
+dependencies: {  }
+id: upgrade_d7_file
+class: Drupal\migrate\Plugin\Migration
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+  - Content
+migration_group: cwd_policy
+label: 'Public files'
+source:
+  plugin: d7_file
+  scheme: public
+  constants:
+    # (Copied from FCS file migration source_base_path code comment.)
+    # The tool configuring this migration must set source_base_path. It
+    # represents the fully qualified path relative to which URIs in the files
+    # table are specified, and must end with a /. See source_full_path
+    # configuration in this migration's process pipeline as an example.
+    # TO DO: Later, update this to https://poli-migr-cu-dfa.pantheonsite.io/
+    # TO DO: Later-later, update this to https://www.dfa.cornell.edu/
+    # source_base_path: 'http://cu-dfa.lndo.site/'
+    # TO DO: remove commented-out destination directory things -- maybe make a note somewhere when you create the GitHub repo for this migration module.......
+    # destination_directory: 'public://policy'
+    source_base_path: 'https://poli-migr-cu-dfa.pantheonsite.io/'
+process:
+  # Don't preserve FIDs b/c destination site isn't empty...
+  # fid:
+  #   -
+  #     plugin: get
+  #     source: fid
+  filename:
+    -
+      plugin: get
+      source: filename
+  source_full_path:
+    -
+      plugin: concat
+      delimiter: /
+      source:
+        - constants/source_base_path
+        - filepath
+    -
+      plugin: urlencode
+  # destination_path:
+  #   -
+  #     plugin: concat
+  #     delimiter: /
+  #     source:
+  #       - constants/destination_directory
+  #       - filename
+  # dump_sourcevar_uri:
+  #   plugin: callback
+  #   callable: var_dump
+  #   source: '@destination_path'
+  uri:
+    -
+      plugin: file_copy
+      source:
+        - '@source_full_path'
+        - uri
+  filemime:
+    -
+      plugin: get
+      source: filemime
+  status:
+    -
+      plugin: get
+      source: status
+  created:
+    -
+      plugin: get
+      source: timestamp
+  changed:
+    -
+      plugin: get
+      source: timestamp
+  uid:
+    -
+      plugin: default_value
+      default_value: '1'
+destination:
+  plugin: 'entity:file'
+migration_dependencies:
+  required: {  }
+  optional: {  }

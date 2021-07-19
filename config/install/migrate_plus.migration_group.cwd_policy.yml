@@ -1,0 +1,13 @@
+uuid: b55efb0e-083a-448a-87cf-d85e6b1d0de7
+langcode: en
+status: true
+dependencies: {  }
+id: cwd_policy
+label: 'CWD Migrate - DFA Policy'
+description: 'Misc migrations originally generated from drush migrate-upgrade --configure-only'
+source_type: 'Drupal 7'
+module: null
+# TO DO: delete the migrations we aren't using, sillypants!
+shared_configuration:
+  source:
+    key: migrate

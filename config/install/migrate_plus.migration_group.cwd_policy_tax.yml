@@ -1,0 +1,12 @@
+uuid: d52c43e6-5cb7-49b7-bcec-356ca70e1277
+langcode: en
+status: true
+dependencies: {  }
+id: cwd_policy_tax
+label: 'CWD Migrate - Policy - taxonomy'
+description: 'Shared plugins and configurations for policy-related taxonomy things.'
+source_type: 'Drupal 7'
+module: null
+shared_configuration:
+  source:
+    key: migrate

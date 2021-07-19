@@ -1,0 +1,41 @@
+uuid: 5b8282bd-931f-4188-be1d-300008b72144
+langcode: en
+status: true
+dependencies: {  }
+id: upgrade_d7_policy_document_media
+class: Drupal\migrate\Plugin\Migration
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+  - Content
+migration_group: cwd_policy
+label: 'Policy document files to to Media document entities'
+source:
+  plugin: cwd_policy_attachments
+process:
+  name: filename
+  status: status
+  created: timestamp
+  changed: timestamp
+  uid:
+    -
+      plugin: default_value
+      default_value: '1'
+  field_media_file/target_id:
+    plugin: migration_lookup
+    source: fid
+    migration: upgrade_d7_policy_files
+    no_stub: true
+  # dump_sourcevar_fdfa:
+  #   plugin: callback
+  #   callable: var_dump
+  #   source: bundle
+destination:
+  plugin: 'entity:media'
+  default_bundle: file
+migration_dependencies:
+  # required:
+  #   - upgrade_d7_policy_files
+  required: {  }
+  optional: {  }

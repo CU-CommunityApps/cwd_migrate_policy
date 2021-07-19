@@ -1,0 +1,168 @@
+uuid: 52eb2011-2ca8-46fc-ba8c-6a0a6fe95cc5
+langcode: en
+status: true
+dependencies: {  }
+id: upgrade_d7_node_complete_policies
+class: Drupal\node\Plugin\migrate\D7NodeTranslation
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+  - Content
+migration_group: cwd_policy
+label: 'Node complete (Policies)'
+source:
+  plugin: d7_node_complete
+  node_type: policies
+process:
+  # Don't preserve NIDs b/c destination site isn't empty...
+  # nid:
+  #   -
+  #     plugin: get
+  #     source: tnid
+  vid:
+    -
+      plugin: get
+      source: vid
+  langcode:
+    -
+      plugin: default_value
+      source: language
+      default_value: und
+  title:
+    -
+      plugin: get
+      source: title
+  uid:
+    -
+      plugin: default_value
+      default_value: '1'
+  # TO DO: ask Drupal Slack friends if this is "bad" or whatever -- I found it in the FCS migration, but idk if there are better ways to do it at this point...
+  # The following will make this migration only migrate *published* nodes.
+  # status:
+  #   -
+  #     plugin: skip_on_empty
+  #     method: row
+  #     source: status
+  status:
+    -
+      plugin: get
+      source: status
+  created:
+    -
+      plugin: get
+      source: created
+  changed:
+    -
+      plugin: get
+      source: timestamp
+  promote:
+    -
+      plugin: default_value
+      default_value: '0'
+  sticky:
+    -
+      plugin: default_value
+      default_value: '0'
+  revision_uid:
+    -
+      plugin: default_value
+      default_value: '1'
+  revision_log:
+    -
+      plugin: get
+      source: log
+  revision_timestamp:
+    -
+      plugin: get
+      source: timestamp
+  content_translation_source:
+    -
+      plugin: get
+      source: source_langcode
+  body:
+    -
+      plugin: get
+      source: body
+  field_policy_date_issued:
+    -
+      plugin: sub_process
+      source: field_policies_date_issued
+      process:
+        value:
+          plugin: format_date
+          from_format: 'Y-m-d H:i:s'
+          to_format: Y-m-d
+          source: value
+  field_policy_date_updated:
+    -
+      plugin: sub_process
+      source: field_policies_date_last_updated
+      process:
+        value:
+          plugin: format_date
+          from_format: 'Y-m-d H:i:s'
+          to_format: Y-m-d
+          source: value
+  field_policy_offices:
+    -
+      plugin: sub_process
+      source: field_policy_department
+      process:
+        target_id: tid
+  field_policy_number:
+    -
+      plugin: get
+      source: field_policy_number
+  field_contact:
+    -
+      plugin: get
+      source: field_contacts_information
+  field_policy_executive:
+    -
+      plugin: sub_process
+      source: field_policy_executive
+      process:
+        target_id: tid
+  field_policy_file:
+    -
+      plugin: sub_process
+      source: field_attachment
+      process:
+        target_id:
+          -
+            plugin: migration_lookup
+            migration: upgrade_d7_policy_document_media
+            source: fid
+            no_stub: true
+  field_policy_volumes:
+    -
+      plugin: sub_process
+      source: field_policy_volumes
+      process:
+        target_id: tid
+  field_policy_date_reviewed:
+    -
+      plugin: sub_process
+      source: field_date_last_reviewed
+      process:
+        value:
+          plugin: format_date
+          from_format: 'Y-m-d H:i:s'
+          to_format: Y-m-d
+          source: value
+  field_recent_changes:
+    -
+      plugin: get
+      source: field_recent_changes
+destination:
+  plugin: 'entity_complete:node'
+  translations: true
+  default_bundle: policy
+migration_dependencies:
+  required:
+    # - upgrade_d7_policy_document_media
+    - upgrade_d7_taxonomy_term_policy_department
+    - upgrade_d7_taxonomy_term_policy_executive
+    - upgrade_d7_taxonomy_term_policy_volumes
+  optional: {  }

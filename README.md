@@ -306,7 +306,8 @@ terminus drush crs-policy-office.test -- ms
 1. look at the library (and "minors" policy page/file), just, basic gut-check review
 
 ----
-## Later
+## Post-migration clean-up
+I did these steps a couple months after the migration, so I could be extra extra sure we were all set with migration things.  (On FCS, I think we didn't do these steps until post-launch? -- anyway)
 1. uninstall migrate* modules:
   ```
   drush @pantheon.crs-policy-office.test pmu migrate

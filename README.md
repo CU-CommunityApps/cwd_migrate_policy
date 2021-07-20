@@ -1,7 +1,9 @@
-# TO DO: add to cwd_migrate_policy "module"
+# Policy Migration
+Migrate policies from DFA Drupal 7 site to CRS Policy Office Drupal 8 site.
 
 ## misc drush/config commands
 
+```
 lando drush cim --partial --source=../config
 lando drush cim --partial --source=modules/custom/cwd_migrate_policy/config/install
 
@@ -12,7 +14,7 @@ lando drush mim upgrade_d7_taxonomy_term_policy_executive
 lando drush mr upgrade_d7_taxonomy_term_policy_executive
 lando drush ms upgrade_d7_taxonomy_term_policy_executive
 lando drush mmsg upgrade_d7_taxonomy_term_policy_executive
-
+```
 
 ## getting started
 ### A few references...
@@ -24,38 +26,43 @@ lando drush mmsg upgrade_d7_taxonomy_term_policy_executive
 
 ### Steps
 1. Create lando apps for each site (the D7 site and D8 site)
-1. Oh by the way, you'll probably have to upgrade drush (on the D8 site) to 9.x, if you haven't already (😭)
-  * `composer require drush/drush:^9`
-1. Look at `lando info` for the D7 site -- copy the "hostnames" string for the "database" service.
-1. (not sure if the following step should come after "step 4"??)<br>
+2. Oh by the way, you'll probably have to upgrade drush (on the D8 site) to 9.x, if you haven't already (😭)<br>
+  `composer require drush/drush:^9`
+3. Look at `lando info` for the D7 site -- copy the "hostnames" string for the "database" service.
+4. (not sure if the following step should come after "step 5"??)<br>
 Create/edit settings.local.php on the D8 site -- if it's otherwise empty, here's the entirety of the contents (no need to put the default database in), assuming you're using the normal pantheon recipe for both D7 and D8 apps (to find out, check .lando.yml and/or .lando.dist.yml):
-```
-<?php
+    ```
+    <?php
 
-/**
- * @file
- * Add "second database" for the migration source (D7 site).
- */
-$databases['migrate']['default'] = [
-  'database' => 'pantheon',
-  'username' => 'pantheon',
-  'password' => 'pantheon',
-  'prefix' => '',
-  'host' => 'database.cudfa.internal',
-  'port' => '3306',
-  'namespace' => 'Drupal\\Core\\Database\\Driver\\mysql',
-  'driver' => 'mysql',
-];
-```
-1. (not sure if the following step should come before "step 3"??)<br>
-On Drupal 8 site, add and enable migrate-y modules:
-  * `composer require 'drupal/migrate_plus'`
-  * `composer require 'drupal/migrate_tools'`
-  * `composer require 'drupal/migrate_upgrade'`
-  * _(optional)_ `composer require drupal/migrate_media_handler`
-  * `lando drush en migrate_plus migrate_tools migrate_upgrade migrate_drupal migrate_drupal_ui`
-  * _(optional)_ `lando drush en migrate_media_handler`
-1. `lando cex` (update your config) and commit those changes...
+    /**
+     * @file
+     * Add "second database" for the migration source (D7 site).
+     */
+    $databases['migrate']['default'] = [
+      'database' => 'pantheon',
+      'username' => 'pantheon',
+      'password' => 'pantheon',
+      'prefix' => '',
+      'host' => 'database.cudfa.internal',
+      'port' => '3306',
+      'namespace' => 'Drupal\\Core\\Database\\Driver\\mysql',
+      'driver' => 'mysql',
+    ];
+    ```
+5. _(not sure if the following step should come before "step 4"??)_<br>
+  On Drupal 8 site, add and enable migrate-y modules:
+    ```
+    composer require 'drupal/migrate_plus'
+    composer require 'drupal/migrate_tools'
+    composer require 'drupal/migrate_upgrade'
+    lando drush en migrate_plus migrate_tools migrate_upgrade migrate_drupal migrate_drupal_ui
+    ```
+    * _(optional)_
+      ```
+      composer require drupal/migrate_media_handler
+      lando drush en migrate_media_handler
+      ```
+6. `lando cex` (update your config) and commit those changes...
 
 ### More steps!
 The rest of your work will depend heavily on the project.  Also, I'm being super rough-drafty in how I write them. YMMV.
@@ -87,8 +94,9 @@ The rest of your work will depend heavily on the project.  Also, I'm being super
 ## ...crap copied from my CLI while doing things on pantheon...
 Reference: https://pantheon.io/blog/running-drupal-8-data-migrations-pantheon-through-drush
 
-_NOTE: "later", replace cu-dfa.poli-migr with cu-dfa.live_
-_NOTE: "later", replace crs-policy-office.pol-mig-stg with crs-policy-office.test_
+_NOTE: "later", replace cu-dfa.poli-migr with cu-dfa.live_<br>
+_NOTE: "later", replace crs-policy-office.pol-mig-stg with crs-policy-office.test_<br>
+```
 composer create-project -d ~/.terminus/plugins pantheon-systems/terminus-secrets-plugin:~1
   (^^ if you don't have this plugin installed already)
 terminus connection:info cu-dfa.poli-migr --field="mysql_url"
@@ -100,102 +108,105 @@ terminus secrets:list crs-policy-office.pol-mig-stg --format=json
   (^^ "did it work?")
 terminus drush crs-policy-office.pol-mig-stg -- en cwd_migrate_policy migrate_drupal_ui
   (^^ I don't think I need to do this.....)
+```
 
 P.S. totally might lose that secrets file -- not sure if I will, but I might, and then just have to regenerate it... (like, if I pull down files from somewhere?? -- or maybe not, I really don't know, just making a note so I don't forget to elaborate later, depending on what happens)
 
-NOTE: later, this all became "nope"... (as implied two lines down)
-I manually updated config ignore in the Drupal UI, to ignore core.extension and migrate-y things...
-  (^^ but then later I undid this nonsense and just codified/used these config entities the way they should be)
+NOTE: later, this all became "nope"... (as implied two lines down)<br>
+I manually updated config ignore in the Drupal UI, to ignore core.extension and migrate-y things...<br>
+  (^^ but then later I undid this nonsense and just codified/used these config entities the way they should be)<br>
+```
 core.extension
 migrate_media_handler.settings
 migrate_drupal.settings
+```
+_^^ idk why I put these three lines into this file; for now, I'm leaving them_
 
 If my migrate media stuff weren't broken, I would do a manual/single config import of migrate_media_handler.settings on the multidev... (Ok I did it even though it's broken, just because.)
 
-THEN I tried to do a partial config import on the multidev (via drush, b/c in the UI it won't do a partial import, so my migration configs get removed), but it didn't ignore config-ignored configs, so it was going to enable/disable things, other annoying stuff -- idk if config_ignore and drush 9 hate each other, super annoying, but whatever, gotta move on, so I codified core.extension, THEN ran the partial config import...
-`terminus drush crs-policy-office.test -- cim --partial --source=../config`
+THEN I tried to do a partial config import on the multidev (via drush, b/c in the UI it won't do a partial import, so my migration configs get removed), but it didn't ignore config-ignored configs, so it was going to enable/disable things, other annoying stuff -- idk if config_ignore and drush 9 hate each other, super annoying, but whatever, gotta move on, so I codified core.extension, THEN ran the partial config import...<br>
+`terminus drush crs-policy-office.test -- cim --partial --source=../config`<br>
   ^^remember, in the case of this migration, the config import includes creating the policy content type and its "peripherals"!
 
-Then I imported the migration configs:
+Then I imported the migration configs:<br>
 `terminus drush crs-policy-office.test -- cim --partial --source=modules/custom/cwd_migrate_policy/config/install`
 
 (I also did cache rebuilds here and there, just for kicks...)
 
-On the multidev, I checked the taxonomy migration group, b/c it's the simplest (and the first that needs to be run):
+On the multidev, I checked the taxonomy migration group, b/c it's the simplest (and the first that needs to be run):<br>
 https://pol-mig-stg-crs-policy-office.pantheonsite.io/admin/structure/migrate/manage/cwd_policy_tax/migrations
-  It said it couldn't find any entities to migrate, and was I sure I put my DB creds in? -- in fact, no, I'm not sure I put my DB creds in...
-
-  To be fair, after the partial import of "normal configs", I realized I created my multidev out of "dev" instead of "test", and the content was WAY out of date, so I copied the DB/files from "test", then had to do some stuff again.
-    Ok that was a lie, I copied the db/files from poli-migr (to pol-mig-stg), b/c I saw that the content was fairly up-to-date on that multidev, and I knew my life would be easier if I copied from that other multidev...
-
-  I checked "secrets" on pol-mig-stg -- indeed, the file was empty:
+* It said it couldn't find any entities to migrate, and was I sure I put my DB creds in? -- in fact, no, I'm not sure I put my DB creds in...
+* To be fair, after the partial import of "normal configs", I realized I created my multidev out of "dev" instead of "test", and the content was WAY out of date, so I copied the DB/files from "test", then had to do some stuff again.
+* Ok that was a lie, I copied the db/files from poli-migr (to pol-mig-stg), b/c I saw that the content was fairly up-to-date on that multidev, and I knew my life would be easier if I copied from that other multidev...
+* I checked "secrets" on pol-mig-stg -- indeed, the file was empty:
   ```
   $ terminus secrets:list crs-policy-office.pol-mig-stg --format=json
   []
   ```
-
-  So I re-did the secrets stuff... (see above -- same command(s))
+* So I re-did the secrets stuff... (see above -- same command(s))<br>
   ...and re-checked the taxonomy migration group (in Drupal UI)...
-
-  BUT STILL NOTHING FOUND! - but no "did you do the DB thing we told you about?" error at the top...
-
-  OH RIGHT! The Pantheon docs use a DB key that's different from the source key I used in my migrations...
-    Pantheon docs DB info (in `settings.migrate-on-pantheon.php`)
+* BUT STILL NOTHING FOUND! - but no "did you do the DB thing we told you about?" error at the top...
+* OH RIGHT! The Pantheon docs use a DB key that's different from the source key I used in my migrations...
+  * Pantheon docs DB info (in `settings.migrate-on-pantheon.php`)
     ```
     $databases['drupal_7']['default'] = array (
     ```
-    My migration source key (in `migrate_plus.migration_group.cwd_policy.yml`)
+  * My migration source key (in `migrate_plus.migration_group.cwd_policy.yml`)
     ```
     shared_configuration:
       source:
         key: migrate
     ```
-
-  Ok so I fixed settings.migrate-on-pantheon.php ("migrate" as the source DB key really does seem to be the "norm", from what I see on the interwebs and in Drupal slack convos...)...
+* Ok so I fixed settings.migrate-on-pantheon.php ("migrate" as the source DB key really does seem to be the "norm", from what I see on the interwebs and in Drupal slack convos...)...
   ```
   $databases['migrate']['default'] = array (
   ```
+* ...committed/pushed that change...
+* STILL NOTHING - tried "ms" via terminus/drush - got "connection refused" - drupal logs showed a similar error...
+* After fighting for a while, it hit me: The source site was ASLEEP.<br>
+`terminus env:wake cu-dfa.poli-migr`
+* TA DA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉
+* Taxonomy migration group shows entities and so on!!<br>
+https://pol-mig-stg-crs-policy-office.pantheonsite.io/admin/structure/migrate/manage/cwd_policy_tax/migrations
+* Now, running migration things on my multidev...<br>
+* `terminus drush crs-policy-office.pol-mig-stg -- mim --group=cwd_policy_tax`
+  * Checked Drupal - the terms exist, the migration statuses look good 🎉
+* `terminus drush crs-policy-office.pol-mig-stg -- mim upgrade_d7_node_complete_policies`
+  * Checked Drupal - things look good (except for my non-functional files/media stuff) 🎉
 
-  ...committed/pushed that change...
+----
+### Reminder - when something fails + hangs
+1. Stop the stuck migration:
+  ```
+  lando drush mst upgrade_d7_file
+  ```
+1. Reset the status of the stopped-stuck migration:
+  ```
+  lando drush mrs upgrade_d7_file
+  ```
 
-  STILL NOTHING - tried "ms" via terminus/drush - got "connection refused" - drupal logs showed a similar error...
-  After fighting for a while, it hit me: The source site was ASLEEP.
-  `terminus env:wake cu-dfa.poli-migr`
-
-  TA DA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉
-
-  Taxonomy migration group shows entities and so on!!
-  https://pol-mig-stg-crs-policy-office.pantheonsite.io/admin/structure/migrate/manage/cwd_policy_tax/migrations
-
-Now, running migration things on my multidev...
-  `terminus drush crs-policy-office.pol-mig-stg -- mim --group=cwd_policy_tax`
-    Checked Drupal - the terms exist, the migration statuses look good 🎉
-  `terminus drush crs-policy-office.pol-mig-stg -- mim upgrade_d7_node_complete_policies`
-    Checked Drupal - things look good (except for my non-functional files/media stuff) 🎉
-
-
-Reminder - when something fails + hangs:
-  Stop the stuck migration:
-  `lando drush mst upgrade_d7_file`
-  Reset the status of the stopped-stuck migration:
-  `lando drush mrs upgrade_d7_file`
-
-
-Order of operations:
---group=cwd_policy_tax
+### Order of operations
+1. `--group=cwd_policy_tax` -- looks like:
+  ```
   terminus drush crs-policy-office.pol-mig-stg -- mim --group=cwd_policy_tax
-upgrade_d7_policy_files
+  ```
+1. `upgrade_d7_policy_files` -- looks like:
+  ```
   terminus drush crs-policy-office.pol-mig-stg -- mim upgrade_d7_policy_files
-upgrade_d7_policy_document_media
+  ```
+1. `upgrade_d7_policy_document_media` -- looks like:
+  ```
   terminus drush crs-policy-office.pol-mig-stg -- mim upgrade_d7_policy_document_media
-upgrade_d7_node_complete_policies
+  ```
+1. `upgrade_d7_node_complete_policies` -- looks like:
+  ```
   terminus drush crs-policy-office.pol-mig-stg -- mim upgrade_d7_node_complete_policies
-
+  ```
 
 ----
-----
-_**troubleshooting notes -- TO DO: clean up or something**_
+### troubleshooting notes
+**_TO DO: clean up or something_**
 
 mysql query I wrote while figuring out how to do the custom source plugin stuff (only grab files that are referenced in field_attachment on nodes of type "policies")
 ```sql
@@ -266,7 +277,6 @@ In MigrateToolsCommands.php line 866:
 ```
 
 ----
-----
 ## actual deployment
 Assumed: Run `cr` a whole lot, because, obviously.
 1. create backup of test env
@@ -294,3 +304,24 @@ terminus drush crs-policy-office.test -- ms
 1. (manually add the one policy that's being a real d-bag at me, node 571)
 1. add two "applicability" taxonomy terms, just to seed/help demonstrate the purpose
 1. look at the library (and "minors" policy page/file), just, basic gut-check review
+
+----
+## Later
+1. uninstall migrate* modules:
+  ```
+  drush @pantheon.crs-policy-office.test pmu migrate
+  ```
+  * (it'll prompt me to uninstall all other migrate modules, including this custom module)
+2. codify the uninstallation
+3. composer remove migration contrib modules (and push):
+  ```
+  composer remove drupal/migrate_*
+  ```
+4. remove migration-specific settings.php file (and push):
+  ```
+  git rm web/sites/default/settings.migrate-on-pantheon.php
+  ```
+5. remove secrets from server -- I'm not going to put the command here, because IRL I would check before deleting, but that's up to you -- here's the delete command info:
+  ```
+  terminus help secrets:delete crs-policy-office.test
+  ```

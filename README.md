@@ -91,7 +91,7 @@ The rest of your work will depend heavily on the project.  Also, I'm being super
 1. `cwd_policy_tax`
 1. TO DO
 
-## ...crap copied from my CLI while doing things on pantheon...
+## ...stuff copied from my CLI while doing things on pantheon...
 Reference: https://pantheon.io/blog/running-drupal-8-data-migrations-pantheon-through-drush
 
 _NOTE: "later", replace cu-dfa.poli-migr with cu-dfa.live_<br>

@@ -326,3 +326,25 @@ I did these steps a couple months after the migration, so I could be extra extra
   ```
   terminus help secrets:delete crs-policy-office.test
   ```
+
+----
+## Misc whatever else
+My lando aliases to make it easier to do partial config imports:
+```yaml
+# .lando.dist.yml
+  migr_cim_normal:
+    service: appserver
+    description: Runs a config partial-import, just of "regular/normal" site config, on local Lando site - meant for use on migration projects.
+    cmd:
+      - echo "[INFO] Running drush cim --partial on ../config directory..."
+      - drush config-import --partial --source=../config/
+      - echo "[INFO] Update complete." \
+        "Consider running drush updb if there are version changes to core or modules."
+  migr_cim_pol:
+    service: appserver
+    description: Runs a config partial-import, just of Policy migration configs, on local Lando site
+    cmd:
+      - echo "[INFO] Running drush cim --partial on cwd_migrate_policy config/install directory..."
+      - drush config-import --partial --source=modules/custom/cwd_migrate_policy/config/install/
+      - echo "[INFO] Update complete." \
+        "Consider running drush cr if there are changes to your migration plugins."

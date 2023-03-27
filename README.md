@@ -1,5 +1,5 @@
 # Policy Migration
-Migrate policies from DFA Drupal 7 site to CRS Policy Office Drupal 8 site.
+Migrate policies from DFA Drupal 7 site to CRS Policy Office Drupal 8 site (July 2021).
 
 ## misc drush/config commands
 

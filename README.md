@@ -20,7 +20,7 @@ lando drush mmsg upgrade_d7_taxonomy_term_policy_executive
 ### A few references...
 * https://thinktandem.io/blog/2020/04/28/lando-migration-webinar-part-1-followup/
 * https://github.com/thinktandem/migration_boilerplate#setup
-* Convo with Duston on Lando Slack: https://devwithlando.slack.com/archives/C2XBSHX8R/p1615916356008600?thread_ts=1604969491.465700&cid=C2XBSHX8R
+* Convo with Dustin on Lando Slack: https://devwithlando.slack.com/archives/C2XBSHX8R/p1615916356008600?thread_ts=1604969491.465700&cid=C2XBSHX8R
   * ...for the migration database, you can start by changing the host to `database.whatevertheappnameoftheoldappis.internal`
 * FCS migration -- very out-of-date, as emphasized in the README! -- https://github.com/CU-CommunityApps/cwd_migrate_fcs
 
